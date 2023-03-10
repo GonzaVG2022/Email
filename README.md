@@ -1,2 +1,2 @@
 # app-Node
-# app creada desde 0
+# Email con validacion de usuario
