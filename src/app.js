@@ -15,7 +15,7 @@ app.use(helmet({
 app.use(cors());
 // routes
 app.get('/', (req, res) =>{
-    return res.send('Welcome to node')
+    return res.send('Welcome to node Flavio')
 });
 
 app.use('/api/v1', router);
