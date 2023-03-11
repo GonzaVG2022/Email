@@ -16,7 +16,7 @@ userRouter.route('/me')
 userRouter.route('/reset_password')
     .post(verifyJWT, resetPassword);
 userRouter.route('/reset_password/:code')
-    .post(verifyJWT, updatePassword )
+    .post(verifyJWT, updatePassword );
 userRouter.route('/:id')
     .get(verifyJWT,getOne)
     .delete(verifyJWT,remove)
