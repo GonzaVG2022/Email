@@ -71,7 +71,7 @@ const resetPassword = catchError(async( req, res ) => {
        to:email,
        subject: "Change Password",
        html:`
-       <h1>Hello ${firstName}</h1>
+       <h1>Hello ${user.firstName}</h1>
        <p>Change Password</p>
        <a href="${link}">${link}</a>
        `
