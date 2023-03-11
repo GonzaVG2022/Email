@@ -13,7 +13,7 @@ const getAll = catchError(async(req, res) => {
 const create = catchError(async(req, res) => {
     const {email, password, firstName, lastName, country, image, frontBaseUrl }= req.body;
     const encripted = await bcrypt.hash( password, 10 );//encriptar contraseña
-    const result = await User.create({email, password:encripted, firstName, lastName, country, image});
+    const result = await User.create({email, password:encripted, firstName, lastName, country, image,frontBaseUrl});
     const code = require ('crypto').randomBytes(32).toString('hex');
     const link = `${frontBaseUrl}/verify_email/${code}`;
     await sendEmail({
