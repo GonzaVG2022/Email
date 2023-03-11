@@ -62,6 +62,7 @@ const verifyEmail = catchError(async( req, res ) => { //empoit para verificar em
     return res.json(emailCode);
 })
 const resetPassword = catchError(async( req, res ) => {
+    const{ email } = req.body;
    const user = await User.findOne({ where: {email}});
    if(!user) return res.status(401).json({message: "Invalid credentials"});
    const code = require ('crypto').randomBytes(32).toString('hex');
