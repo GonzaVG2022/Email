@@ -116,5 +116,6 @@ module.exports = {
     update,
     verifyEmail,
     login,getLoggerUser,
-    resetPassword
+    resetPassword,
+    updatePassword
 }
