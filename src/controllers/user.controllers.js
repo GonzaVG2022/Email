@@ -4,18 +4,18 @@ const bcrypt = require('bcrypt');
 const sendEmail = require('../utils/sendEmail');
 const EmailCode = require('../models/EmailCode');
 const jwt = require('jsonwebtoken');
-
+const frontBaseUrl = process.env.URL_BASE;
 const getAll = catchError(async(req, res) => {
     const results = await User.findAll();
     return res.json(results);
 });
 
 const create = catchError(async(req, res) => {
-    const {email, password, firstName, lastName, country, image, frontBaseUrl}= req.body;
+    const {email, password, firstName, lastName, country, image }= req.body;
     const encripted = await bcrypt.hash( password, 10 );//encriptar contraseña
     const result = await User.create({email, password:encripted, firstName, lastName, country, image});
     const code = require ('crypto').randomBytes(32).toString('hex');
-    const link = `${frontBaseUrl}/verify_email/${code}`;
+    const link = `${frontBaseUrl}users/verify_email/${code}`;
     await sendEmail({
         to:email,
         subject: "User app email verification",
@@ -61,7 +61,32 @@ const verifyEmail = catchError(async( req, res ) => { //empoit para verificar em
     await emailCode.destroy();
     return res.json(emailCode);
 })
-
+const resetPassword = catchError(async( req, res ) => {
+   const user = await User.findOne({ where: {email}});
+   if(!user) return res.status(401).json({message: "Invalid credentials"});
+   const code = require ('crypto').randomBytes(32).toString('hex');
+   const link = `${frontBaseUrl}users/reset_password/${code}`;
+   await sendEmail({
+       to:email,
+       subject: "Change Password",
+       html:`
+       <h1>Hello ${firstName}</h1>
+       <p>Change Password</p>
+       <a href="${link}">${link}</a>
+       `
+   })
+   await EmailCode.create({ code, userId: user.id });
+   return res.sendStatus(204);
+})
+const updatePassword =  catchError(async( req, res ) => {
+    const { code } = req.params;
+    const emailCode = await EmailCode.findOne( { where: { code} } );
+    if(!emailCode) return res.status(401).json({ message: "Invalid code"})
+    const encripted  = await bcrypt.hash(req.body.password,10);
+    await User.update( { password:encripted }, { where: { id: emailCode.userId } } );
+    await emailCode.destroy();    
+    return res.sendStatus(204);
+})
 const login = catchError(async( req, res ) => {
     const { email, password } = req.body;
     const user = await User.findOne({ where: {email}});
@@ -80,7 +105,8 @@ const login = catchError(async( req, res ) => {
 const getLoggerUser = catchError( async( req, res ) => {
     const user = req.user;
     return res.json(user);
-} )
+} );
+
 
 module.exports = {
     getAll,
@@ -89,5 +115,6 @@ module.exports = {
     remove,
     update,
     verifyEmail,
-    login,getLoggerUser
+    login,getLoggerUser,
+    resetPassword
 }
